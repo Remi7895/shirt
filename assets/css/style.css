@@ -6,25 +6,12 @@
   --cream:  #F5F4F0;
   --accent: #3B6FD4;
   --muted:  #8A8F9E;
-
-  /* saisons */
-  --spring: #7DB87A;
-  --spring-light: #E8F5E7;
-  --summer: #E8A838;
-  --summer-light: #FEF3DC;
-  --autumn: #C45C2E;
-  --autumn-light: #FAE8DF;
-  --winter: #4A7CB5;
-  --winter-light: #DDE8F5;
 }
 
-html { scroll-behavior: smooth; }
-
-body {
+html, body {
+  height: 100%;
   font-family: 'Inter', sans-serif;
-  background: var(--cream);
-  color: var(--navy);
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* ─── HEADER ───────────────────────────────────────────────── */
@@ -32,428 +19,208 @@ body {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 100;
-  padding: 0 48px;
-  height: 68px;
+  height: 72px;
   display: flex;
   align-items: center;
-  background: transparent;
-  transition: background 0.4s ease, backdrop-filter 0.4s ease;
-}
-
-.header.scrolled {
-  background: rgba(26, 39, 68, 0.92);
-  backdrop-filter: blur(12px);
-}
-
-.header-inner {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 0;
 }
 
 .logo {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
-  font-size: 1.4rem;
+  font-size: 2rem;
   color: #fff;
   text-decoration: none;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.18em;
+  width: 180px;
+  text-align: center;
+  flex-shrink: 0;
+  mix-blend-mode: difference;
+  transition: letter-spacing 0.4s ease;
 }
+
+.logo:hover { letter-spacing: 0.28em; }
 
 .nav {
   display: flex;
   align-items: center;
-  gap: 36px;
+  gap: 40px;
+  width: 340px;
 }
+
+.nav:first-of-type { justify-content: flex-end; }
+.nav:last-of-type  { justify-content: flex-start; }
 
 .nav a {
-  font-size: 0.875rem;
-  font-weight: 400;
-  color: rgba(255,255,255,0.75);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.nav a:hover { color: #fff; }
-
-.btn-nav {
-  background: var(--accent) !important;
-  color: #fff !important;
-  padding: 10px 22px;
-  border-radius: 6px;
-  font-weight: 500 !important;
-  transition: background 0.2s, transform 0.2s !important;
-}
-
-.btn-nav:hover {
-  background: #2d59be !important;
-  transform: translateY(-1px);
-}
-
-/* ─── HERO ─────────────────────────────────────────────────── */
-.hero {
-  min-height: 100vh;
-  background: var(--navy);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 120px 48px 80px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* grain texture */
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  opacity: 0.4;
-}
-
-.hero-eyebrow {
+  font-family: 'Inter', sans-serif;
   font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
+  font-weight: 400;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 20px;
-  opacity: 0;
-  transform: translateY(16px);
-  animation: fadeUp 0.7s 0.2s forwards;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  mix-blend-mode: difference;
+  transition: color 0.25s, letter-spacing 0.25s;
 }
 
-.hero-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(3rem, 6vw, 5.5rem);
-  font-weight: 700;
+.nav a:hover {
   color: #fff;
-  line-height: 1.08;
-  text-align: center;
-  margin-bottom: 20px;
-  opacity: 0;
-  transform: translateY(16px);
-  animation: fadeUp 0.7s 0.35s forwards;
+  letter-spacing: 0.18em;
 }
 
-.hero-highlight {
-  background: linear-gradient(90deg, var(--accent), #6a9fe8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.hero-sub {
-  font-size: 1.1rem;
-  color: rgba(255,255,255,0.55);
-  text-align: center;
-  max-width: 480px;
-  line-height: 1.7;
-  margin-bottom: 72px;
-  opacity: 0;
-  transform: translateY(16px);
-  animation: fadeUp 0.7s 0.5s forwards;
-}
-
-/* ─── SEASONS GRID ─────────────────────────────────────────── */
-.seasons-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0;
-  width: 100%;
-  max-width: 1280px;
-  border-radius: 20px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.08);
-  opacity: 0;
-  transform: translateY(24px);
-  animation: fadeUp 0.8s 0.65s forwards;
-}
-
-.season-card {
-  position: relative;
-  padding: 48px 36px 44px;
+/* ─── SEASONS ──────────────────────────────────────────────── */
+.seasons {
   display: flex;
-  flex-direction: column;
-  gap: 0;
-  cursor: pointer;
-  overflow: hidden;
-  min-height: 420px;
-  border-right: 1px solid rgba(255,255,255,0.07);
-  transition: flex 0.5s cubic-bezier(0.4,0,0.2,1);
+  height: 100vh;
+  width: 100vw;
 }
 
-.season-card:last-child { border-right: none; }
+.season {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  padding: 56px 44px;
+  text-decoration: none;
+  overflow: hidden;
+  transition: flex 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
 
-/* background overlay per season */
+.season:last-child { border-right: none; }
+.seasons:has(.season:hover) .season:not(:hover) { flex: 0.55; }
+.season:hover { flex: 2.2; }
+
+/* backgrounds */
+.season-printemps { background: #1e2e1e; }
+.season-ete       { background: #2e2510; }
+.season-automne   { background: #2b1a10; }
+.season-hiver     { background: #101b2e; }
+
 .season-bg {
   position: absolute;
   inset: 0;
-  opacity: 0;
-  transition: opacity 0.5s ease;
+  opacity: 0.55;
+  transition: opacity 0.7s ease;
+  background-size: cover;
+  background-position: center;
 }
 
-.season-printemps .season-bg { background: radial-gradient(ellipse at 30% 60%, rgba(125,184,122,0.18) 0%, transparent 70%); }
-.season-ete       .season-bg { background: radial-gradient(ellipse at 30% 60%, rgba(232,168,56,0.18) 0%, transparent 70%); }
-.season-automne   .season-bg { background: radial-gradient(ellipse at 30% 60%, rgba(196,92,46,0.18) 0%, transparent 70%); }
-.season-hiver     .season-bg { background: radial-gradient(ellipse at 30% 60%, rgba(74,124,181,0.18) 0%, transparent 70%); }
-
-.season-card:hover .season-bg { opacity: 1; }
-
-/* icons */
-.season-icon {
-  width: 48px;
-  height: 48px;
-  margin-bottom: 28px;
-  transition: transform 0.4s ease;
+.season-printemps .season-bg {
+  background-image: radial-gradient(ellipse at 40% 70%, rgba(100,160,90,0.55) 0%, transparent 65%),
+                    radial-gradient(ellipse at 80% 20%, rgba(140,200,130,0.2) 0%, transparent 50%);
+}
+.season-ete .season-bg {
+  background-image: radial-gradient(ellipse at 40% 70%, rgba(220,160,40,0.55) 0%, transparent 65%),
+                    radial-gradient(ellipse at 75% 15%, rgba(240,100,40,0.15) 0%, transparent 50%);
+}
+.season-automne .season-bg {
+  background-image: radial-gradient(ellipse at 40% 70%, rgba(180,80,30,0.55) 0%, transparent 65%),
+                    radial-gradient(ellipse at 80% 20%, rgba(220,130,40,0.2) 0%, transparent 50%);
+}
+.season-hiver .season-bg {
+  background-image: radial-gradient(ellipse at 40% 70%, rgba(60,110,190,0.55) 0%, transparent 65%),
+                    radial-gradient(ellipse at 80% 20%, rgba(180,210,240,0.15) 0%, transparent 50%);
 }
 
-.season-card:hover .season-icon { transform: scale(1.15) rotate(8deg); }
+.season:hover .season-bg { opacity: 0.85; }
 
-.season-printemps .season-icon { color: var(--spring); }
-.season-ete       .season-icon { color: var(--summer); }
-.season-automne   .season-icon { color: var(--autumn); }
-.season-hiver     .season-icon { color: var(--winter); }
+/* vignette */
+.season::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 60%);
+  pointer-events: none;
+}
 
-.season-icon svg { width: 100%; height: 100%; }
+/* content */
+.season-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-/* label */
 .season-label {
-  display: block;
-  font-size: 0.72rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.7rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 10px;
-  transition: color 0.3s;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.35);
+  transition: color 0.4s;
 }
 
-.season-card:hover .season-label { color: rgba(255,255,255,0.7); }
+.season:hover .season-label { color: rgba(255,255,255,0.6); }
 
-/* title */
 .season-title {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(1.3rem, 1.8vw, 1.75rem);
   font-weight: 700;
+  font-size: clamp(1.6rem, 2.2vw, 2.6rem);
   color: #fff;
-  line-height: 1.15;
-  margin-bottom: 16px;
-}
-
-/* desc */
-.season-desc {
-  font-size: 0.875rem;
-  color: rgba(255,255,255,0.45);
-  line-height: 1.65;
-  margin-bottom: 28px;
-  flex: 1;
-  transition: color 0.3s;
-}
-
-.season-card:hover .season-desc { color: rgba(255,255,255,0.65); }
-
-/* CTA */
-.season-cta {
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-decoration: none;
-  letter-spacing: 0.03em;
-  opacity: 0;
-  transform: translateX(-8px);
-  transition: opacity 0.3s 0.05s, transform 0.3s 0.05s, color 0.2s;
-}
-
-.season-printemps .season-cta { color: var(--spring); }
-.season-ete       .season-cta { color: var(--summer); }
-.season-automne   .season-cta { color: var(--autumn); }
-.season-hiver     .season-cta { color: var(--winter); }
-
-.season-card:hover .season-cta {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-/* big number */
-.season-number {
-  position: absolute;
-  bottom: 24px;
-  right: 28px;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 4rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.04);
   line-height: 1;
-  transition: color 0.4s;
-  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: font-size 0.5s ease;
 }
 
-.season-card:hover .season-number { color: rgba(255,255,255,0.07); }
+.season:hover .season-title {
+  font-size: clamp(2.2rem, 3.2vw, 3.8rem);
+}
 
-/* ─── SCROLL HINT ──────────────────────────────────────────── */
-.hero-scroll-hint {
-  position: absolute;
-  bottom: 36px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
+.season-desc {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0);
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  transform: translateY(8px);
+  transition: color 0.4s 0.1s, transform 0.4s 0.1s;
+}
+
+.season:hover .season-desc {
+  color: rgba(255,255,255,0.5);
+  transform: translateY(0);
+}
+
+/* ─── ANIMATIONS D'ENTRÉE ──────────────────────────────────── */
+.season {
   opacity: 0;
-  animation: fadeIn 1s 1.4s forwards;
+  animation: revealSeason 0.9s ease forwards;
 }
 
-.hero-scroll-hint span {
-  font-size: 0.7rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.3);
-}
+.season-printemps { animation-delay: 0.1s; }
+.season-ete       { animation-delay: 0.22s; }
+.season-automne   { animation-delay: 0.34s; }
+.season-hiver     { animation-delay: 0.46s; }
 
-.scroll-line {
-  width: 1px;
-  height: 40px;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
-  animation: scrollPulse 1.8s ease-in-out infinite;
-}
-
-/* ─── FEATURES ─────────────────────────────────────────────── */
-.features {
-  background: var(--cream);
-  padding: 120px 48px;
-}
-
-.features-inner { max-width: 1280px; margin: 0 auto; }
-
-.section-header {
-  text-align: center;
-  margin-bottom: 72px;
-}
-
-.section-eyebrow {
-  display: block;
-  font-size: 0.78rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 14px;
-}
-
-.section-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(2rem, 3.5vw, 2.75rem);
-  font-weight: 700;
-  color: var(--navy);
-  line-height: 1.15;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 32px;
-}
-
-.feature-item {
-  background: #fff;
-  border: 1px solid rgba(26,39,68,0.08);
-  border-radius: 16px;
-  padding: 40px 32px;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.feature-item:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 48px rgba(26,39,68,0.1);
-}
-
-.feature-icon {
-  font-size: 1.8rem;
-  margin-bottom: 20px;
-  color: var(--accent);
-}
-
-.feature-item h3 {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--navy);
-  margin-bottom: 10px;
-}
-
-.feature-item p {
-  font-size: 0.9rem;
-  color: var(--muted);
-  line-height: 1.65;
-}
-
-/* ─── FOOTER ───────────────────────────────────────────────── */
-.footer {
-  background: var(--navy);
-  padding: 60px 48px;
-}
-
-.footer-inner {
-  max-width: 1280px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.footer-logo {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: #fff;
-  letter-spacing: 0.14em;
-}
-
-.footer-tagline {
-  font-size: 0.9rem;
-  color: rgba(255,255,255,0.4);
-  font-style: italic;
-}
-
-.footer-copy {
-  font-size: 0.78rem;
-  color: rgba(255,255,255,0.25);
-  margin-top: 8px;
-}
-
-/* ─── ANIMATIONS ───────────────────────────────────────────── */
-@keyframes fadeUp {
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeIn {
-  to { opacity: 1; }
-}
-
-@keyframes scrollPulse {
-  0%, 100% { transform: scaleY(1); opacity: 1; }
-  50%       { transform: scaleY(0.6); opacity: 0.4; }
+@keyframes revealSeason {
+  from { opacity: 0; clip-path: inset(0 100% 0 0); }
+  to   { opacity: 1; clip-path: inset(0 0% 0 0); }
 }
 
 /* ─── RESPONSIVE ───────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  .seasons-grid { grid-template-columns: repeat(2, 1fr); }
-  .features-grid { grid-template-columns: repeat(2, 1fr); }
-  .season-card { min-height: 340px; }
-}
+@media (max-width: 768px) {
+  html, body { overflow: auto; }
 
-@media (max-width: 640px) {
-  .header { padding: 0 24px; }
-  .hero { padding: 100px 24px 60px; }
-  .seasons-grid { grid-template-columns: 1fr; border-radius: 16px; }
-  .features-grid { grid-template-columns: 1fr; }
-  .features { padding: 80px 24px; }
-  .nav a:not(.btn-nav) { display: none; }
+  .header { background: var(--navy); }
+
+  .seasons { flex-direction: column; height: auto; }
+
+  .season {
+    height: 25vh;
+    min-height: 160px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 32px 28px;
+  }
+
+  .seasons:has(.season:hover) .season:not(:hover) { flex: 1; }
+  .season:hover { flex: 1; }
+
+  .nav { width: auto; gap: 20px; }
+  .logo { width: auto; font-size: 1.5rem; }
+
+  .season-title { font-size: 1.8rem !important; }
 }
