@@ -93,10 +93,10 @@ html, body {
 .season:hover { flex: 2.2; }
 
 /* backgrounds */
-.season-printemps { background: #1e2e1e; }
-.season-ete       { background: #2e2510; }
-.season-automne   { background: #2b1a10; }
-.season-hiver     { background: #101b2e; }
+.season-spring { background: #1e2e1e; }
+.season-summer { background: #2e2510; }
+.season-fall   { background: #2b1a10; }
+.season-winter { background: #101b2e; }
 
 .season-bg {
   position: absolute;
@@ -107,19 +107,19 @@ html, body {
   background-position: center;
 }
 
-.season-printemps .season-bg {
+.season-spring .season-bg {
   background-image: radial-gradient(ellipse at 40% 70%, rgba(100,160,90,0.55) 0%, transparent 65%),
                     radial-gradient(ellipse at 80% 20%, rgba(140,200,130,0.2) 0%, transparent 50%);
 }
-.season-ete .season-bg {
+.season-summer .season-bg {
   background-image: radial-gradient(ellipse at 40% 70%, rgba(220,160,40,0.55) 0%, transparent 65%),
                     radial-gradient(ellipse at 75% 15%, rgba(240,100,40,0.15) 0%, transparent 50%);
 }
-.season-automne .season-bg {
+.season-fall .season-bg {
   background-image: radial-gradient(ellipse at 40% 70%, rgba(180,80,30,0.55) 0%, transparent 65%),
                     radial-gradient(ellipse at 80% 20%, rgba(220,130,40,0.2) 0%, transparent 50%);
 }
-.season-hiver .season-bg {
+.season-winter .season-bg {
   background-image: radial-gradient(ellipse at 40% 70%, rgba(60,110,190,0.55) 0%, transparent 65%),
                     radial-gradient(ellipse at 80% 20%, rgba(180,210,240,0.15) 0%, transparent 50%);
 }
@@ -144,16 +144,6 @@ html, body {
   gap: 6px;
 }
 
-.season-label {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  color: rgba(255,255,255,0.35);
-  transition: color 0.4s;
-}
-
-.season:hover .season-label { color: rgba(255,255,255,0.6); }
 
 .season-title {
   font-family: 'Space Grotesk', sans-serif;
@@ -190,10 +180,10 @@ html, body {
   animation: revealSeason 0.9s ease forwards;
 }
 
-.season-printemps { animation-delay: 0.1s; }
-.season-ete       { animation-delay: 0.22s; }
-.season-automne   { animation-delay: 0.34s; }
-.season-hiver     { animation-delay: 0.46s; }
+.season-spring { animation-delay: 0.1s; }
+.season-summer { animation-delay: 0.22s; }
+.season-fall   { animation-delay: 0.34s; }
+.season-winter { animation-delay: 0.46s; }
 
 @keyframes revealSeason {
   from { opacity: 0; clip-path: inset(0 100% 0 0); }
