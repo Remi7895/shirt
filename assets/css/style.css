@@ -101,30 +101,22 @@ html, body {
 .season-bg {
   position: absolute;
   inset: 0;
-  opacity: 0.55;
-  transition: opacity 0.7s ease;
   background-size: cover;
   background-position: center;
+  opacity: 0.6;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  transform: scale(1.04);
 }
 
-.season-spring .season-bg {
-  background-image: radial-gradient(ellipse at 40% 70%, rgba(100,160,90,0.55) 0%, transparent 65%),
-                    radial-gradient(ellipse at 80% 20%, rgba(140,200,130,0.2) 0%, transparent 50%);
-}
-.season-summer .season-bg {
-  background-image: radial-gradient(ellipse at 40% 70%, rgba(220,160,40,0.55) 0%, transparent 65%),
-                    radial-gradient(ellipse at 75% 15%, rgba(240,100,40,0.15) 0%, transparent 50%);
-}
-.season-fall .season-bg {
-  background-image: radial-gradient(ellipse at 40% 70%, rgba(180,80,30,0.55) 0%, transparent 65%),
-                    radial-gradient(ellipse at 80% 20%, rgba(220,130,40,0.2) 0%, transparent 50%);
-}
-.season-winter .season-bg {
-  background-image: radial-gradient(ellipse at 40% 70%, rgba(60,110,190,0.55) 0%, transparent 65%),
-                    radial-gradient(ellipse at 80% 20%, rgba(180,210,240,0.15) 0%, transparent 50%);
-}
+.season-spring .season-bg { background-image: url('../img/spring-banner.jpg'); }
+.season-summer .season-bg { background-image: url('../img/summer-banner.jpg'); }
+.season-fall   .season-bg { background-image: url('../img/fall-banner.jpg'); }
+.season-winter .season-bg { background-image: url('../img/winter-banner.jpg'); }
 
-.season:hover .season-bg { opacity: 0.85; }
+.season:hover .season-bg {
+  opacity: 0.85;
+  transform: scale(1);
+}
 
 /* vignette */
 .season::after {
