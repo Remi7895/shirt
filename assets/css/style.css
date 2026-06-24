@@ -19,22 +19,20 @@ html, body {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 100;
-  height: 72px;
+  height: 68px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0;
+  padding: 0 32px;
 }
 
 .logo {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
-  font-size: 2rem;
+  font-size: 1.9rem;
   color: #fff;
   text-decoration: none;
   letter-spacing: 0.18em;
-  width: 180px;
-  text-align: center;
   flex-shrink: 0;
   mix-blend-mode: difference;
   transition: letter-spacing 0.4s ease;
@@ -45,29 +43,29 @@ html, body {
 .nav {
   display: flex;
   align-items: center;
-  gap: 40px;
-  width: 340px;
+  gap: 32px;
+  flex: 1;
 }
 
-.nav:first-of-type { justify-content: flex-end; }
-.nav:last-of-type  { justify-content: flex-start; }
+.nav:first-of-type { justify-content: flex-end; padding-right: 40px; }
+.nav:last-of-type  { justify-content: flex-start; padding-left: 40px; }
 
 .nav a {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 400;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(255,255,255,0.7);
   text-decoration: none;
+  white-space: nowrap;
   mix-blend-mode: difference;
   transition: color 0.25s, letter-spacing 0.25s;
 }
 
-.nav a:hover {
-  color: #fff;
-  letter-spacing: 0.18em;
-}
+.nav a:hover { color: #fff; letter-spacing: 0.18em; }
+
+/* mobile nav hidden by default */
+.nav { display: none; }
 
 /* ─── SEASONS ──────────────────────────────────────────────── */
 .seasons {
@@ -81,16 +79,24 @@ html, body {
   flex: 1;
   display: flex;
   align-items: flex-end;
-  padding: 56px 44px;
+  padding: 40px 28px;
   text-decoration: none;
   overflow: hidden;
   transition: flex 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   border-right: 1px solid rgba(255,255,255,0.06);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .season:last-child { border-right: none; }
-.seasons:has(.season:hover) .season:not(:hover) { flex: 0.55; }
-.season:hover { flex: 2.2; }
+
+/* vignette */
+.season::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 55%);
+  pointer-events: none;
+}
 
 /* backgrounds */
 .season-spring { background: #1e2e1e; }
@@ -113,57 +119,43 @@ html, body {
 .season-fall   .season-bg { background-image: url('../img/fall-banner.jpg'); }
 .season-winter .season-bg { background-image: url('../img/winter-banner.jpg'); }
 
-.season:hover .season-bg {
-  opacity: 0.85;
-  transform: scale(1);
-}
-
-/* vignette */
-.season::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 60%);
-  pointer-events: none;
-}
-
 /* content */
 .season-content {
   position: relative;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
-
 
 .season-title {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
-  font-size: clamp(1.6rem, 2.2vw, 2.6rem);
+  font-size: 1.5rem;
   color: #fff;
   line-height: 1;
-  white-space: nowrap;
-  overflow: hidden;
   transition: font-size 0.5s ease;
 }
 
-.season:hover .season-title {
-  font-size: clamp(2.2rem, 3.2vw, 3.8rem);
-}
-
 .season-desc {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: rgba(255,255,255,0);
   font-weight: 300;
-  letter-spacing: 0.04em;
-  transform: translateY(8px);
+  transform: translateY(6px);
   transition: color 0.4s 0.1s, transform 0.4s 0.1s;
+  white-space: nowrap;
 }
 
-.season:hover .season-desc {
-  color: rgba(255,255,255,0.5);
-  transform: translateY(0);
+/* ─── DESKTOP HOVER ────────────────────────────────────────── */
+@media (hover: hover) {
+  .nav { display: flex; }
+
+  .seasons:has(.season:hover) .season:not(:hover) { flex: 0.55; }
+  .season:hover { flex: 2.2; }
+
+  .season:hover .season-bg { opacity: 0.85; transform: scale(1); }
+  .season:hover .season-title { font-size: clamp(2rem, 3vw, 3.5rem); }
+  .season:hover .season-desc { color: rgba(255,255,255,0.5); transform: translateY(0); }
 }
 
 /* ─── ANIMATIONS D'ENTRÉE ──────────────────────────────────── */
@@ -182,27 +174,37 @@ html, body {
   to   { opacity: 1; clip-path: inset(0 0% 0 0); }
 }
 
-/* ─── RESPONSIVE ───────────────────────────────────────────── */
+/* ─── MOBILE ───────────────────────────────────────────────── */
 @media (max-width: 768px) {
   html, body { overflow: auto; }
 
-  .header { background: var(--navy); }
-
-  .seasons { flex-direction: column; height: auto; }
-
-  .season {
-    height: 25vh;
-    min-height: 160px;
-    border-right: none;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    padding: 32px 28px;
+  .header {
+    background: rgba(26,39,68,0.95);
+    backdrop-filter: blur(12px);
+    justify-content: center;
   }
 
-  .seasons:has(.season:hover) .season:not(:hover) { flex: 1; }
-  .season:hover { flex: 1; }
+  .logo { font-size: 1.6rem; mix-blend-mode: normal; }
 
-  .nav { width: auto; gap: 20px; }
-  .logo { width: auto; font-size: 1.5rem; }
+  .seasons {
+    flex-direction: column;
+    height: auto;
+    min-height: 100dvh;
+  }
 
-  .season-title { font-size: 1.8rem !important; }
+  .season {
+    flex: none;
+    height: 25dvh;
+    min-height: 150px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 24px 20px;
+    align-items: flex-end;
+  }
+
+  .season:last-child { border-bottom: none; }
+
+  .season-bg { transform: scale(1); opacity: 0.65; }
+  .season-title { font-size: 1.7rem; }
+  .season-desc { color: rgba(255,255,255,0.4); transform: translateY(0); }
 }
