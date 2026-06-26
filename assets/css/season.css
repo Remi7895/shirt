@@ -221,10 +221,15 @@ body {
 
 .outfit-img {
   width: 100%;
-  aspect-ratio: 3/4;
-  object-fit: cover;
-  object-position: top;
   display: block;
+}
+
+@media (min-width: 640px) {
+  .outfit-img {
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    object-position: top;
+  }
 }
 
 .outfit-img-placeholder {
