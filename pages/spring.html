@@ -90,8 +90,14 @@
           </div>
         </div>
         <div class="form-group">
-          <label>Description</label>
-          <textarea name="desc" placeholder="Notes, brands, where to wear it…"></textarea>
+          <label>Pieces</label>
+          <div class="pieces-input">
+            <div id="pieces-list" class="pieces-list"></div>
+            <div class="pieces-add-row">
+              <input type="text" id="piece-input" placeholder="White jersey, blue jeans…" autocomplete="off" />
+              <button type="button" id="piece-add-btn">+</button>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>

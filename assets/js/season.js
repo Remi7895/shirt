@@ -13,6 +13,41 @@ let outfits      = JSON.parse(localStorage.getItem(SEASON_KEY) || '[]');
 let pendingImage = null;
 let activeFilter = 'all';
 let editingId    = null;
+let pieces       = [];
+
+const piecesList  = document.getElementById('pieces-list');
+const pieceInput  = document.getElementById('piece-input');
+const pieceAddBtn = document.getElementById('piece-add-btn');
+
+function renderPieces() {
+  piecesList.innerHTML = pieces.map((p, i) => `
+    <div class="piece-item">
+      <span class="piece-bullet">—</span>
+      <span class="piece-text">${p}</span>
+      <button type="button" class="piece-remove" data-i="${i}">×</button>
+    </div>
+  `).join('');
+  piecesList.querySelectorAll('.piece-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      pieces.splice(+btn.dataset.i, 1);
+      renderPieces();
+    });
+  });
+}
+
+function addPiece() {
+  const val = pieceInput.value.trim();
+  if (!val) return;
+  pieces.push(val);
+  pieceInput.value = '';
+  renderPieces();
+  pieceInput.focus();
+}
+
+pieceAddBtn.addEventListener('click', addPiece);
+pieceInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); addPiece(); }
+});
 
 // ── Storage ───────────────────────────────────────────────
 function save() {
@@ -85,7 +120,10 @@ function render() {
           </div>
         </div>
         ${outfit.tags ? `<div class="outfit-tags">${outfit.tags.split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('')}</div>` : ''}
-        ${outfit.desc ? `<p style="font-size:0.8rem;color:#8A8F9E;margin-top:10px;line-height:1.5">${outfit.desc}</p>` : ''}
+        ${outfit.pieces && outfit.pieces.length ? `
+          <ul class="piece-list">
+            ${outfit.pieces.map(p => `<li>${p}</li>`).join('')}
+          </ul>` : ''}
       </div>
       <div class="outfit-actions">
         <button class="action-btn edit" onclick="openEditModal('${outfit.id}')">
@@ -131,9 +169,11 @@ window.deleteOutfit = function(id) {
 // ── Modal ─────────────────────────────────────────────────
 window.openModal = function() {
   editingId = null;
+  pieces = [];
   form.reset();
   pendingImage = null;
   imgPreview.style.display = 'none';
+  renderPieces();
   document.querySelector('.modal-title').textContent = 'New outfit';
   document.querySelector('.btn-save').textContent = 'Save outfit';
   modalOverlay.classList.add('open');
@@ -143,11 +183,11 @@ window.openEditModal = function(id) {
   const outfit = outfits.find(o => o.id === id);
   if (!outfit) return;
   editingId = id;
+  pieces = Array.isArray(outfit.pieces) ? [...outfit.pieces] : [];
   form.reset();
   form.elements['name'].value    = outfit.name    || '';
   form.elements['weather'].value = outfit.weather || '';
   form.elements['tags'].value    = outfit.tags    || '';
-  form.elements['desc'].value    = outfit.desc    || '';
   pendingImage = outfit.image || null;
   if (pendingImage) {
     imgPreview.src = pendingImage;
@@ -155,6 +195,7 @@ window.openEditModal = function(id) {
   } else {
     imgPreview.style.display = 'none';
   }
+  renderPieces();
   document.querySelector('.modal-title').textContent = 'Edit outfit';
   document.querySelector('.btn-save').textContent = 'Update outfit';
   modalOverlay.classList.add('open');
@@ -182,7 +223,7 @@ form.addEventListener('submit', (e) => {
       name:    data.name,
       weather: data.weather,
       tags:    data.tags,
-      desc:    data.desc,
+      pieces:  [...pieces],
       image:   pendingImage !== null ? pendingImage : o.image,
     });
   } else {
@@ -191,7 +232,7 @@ form.addEventListener('submit', (e) => {
       name:    data.name,
       weather: data.weather,
       tags:    data.tags,
-      desc:    data.desc,
+      pieces:  [...pieces],
       image:   pendingImage,
       date:    new Date().toISOString(),
     });
