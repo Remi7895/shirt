@@ -1,31 +1,18 @@
-// season.js — outfit manager (localStorage)
-// Each season page passes: SEASON_KEY, SEASON_NAME
+// season.js — outfit manager (Supabase)
+// Each season page must load supabase-js and define: SEASON_KEY, SEASON_NAME
+
+const SUPABASE_URL = 'https://jpkuqsawjqfxfplrbwck.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_bKNZpnAwKlY1jdrbTfS1gA_VKFtV8TM';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const outfitGrid   = document.getElementById('outfit-grid');
 const outfitCount  = document.getElementById('outfit-count');
 const modalOverlay = document.getElementById('modal-overlay');
 const form         = document.getElementById('outfit-form');
-const imgUpload    = document.getElementById('img-upload');
 const imgPreview   = document.getElementById('img-preview');
 const imgInput     = document.getElementById('img-input');
 
-let outfits      = JSON.parse(localStorage.getItem(SEASON_KEY) || '[]');
-
-// ── Migrate old uncompressed images ───────────────────────
-function migrateImages() {
-  const toMigrate = outfits.filter(o => o.image && o.image.length > 100000);
-  if (!toMigrate.length) return;
-  let done = 0;
-  toMigrate.forEach(o => {
-    compressImage(o.image, 800, 0.75, (compressed) => {
-      outfits = outfits.map(x => x.id === o.id ? { ...x, image: compressed } : x);
-      done++;
-      if (done === toMigrate.length) {
-        try { localStorage.setItem(SEASON_KEY, JSON.stringify(outfits)); } catch(e) {}
-      }
-    });
-  });
-}
+let outfits      = [];
 let pendingImage = null;
 let activeFilter = 'all';
 let editingId    = null;
@@ -35,6 +22,35 @@ const piecesList  = document.getElementById('pieces-list');
 const pieceInput  = document.getElementById('piece-input');
 const pieceAddBtn = document.getElementById('piece-add-btn');
 
+// ── Image compression ─────────────────────────────────────
+function compressImage(dataUrl, maxPx, quality, cb) {
+  const img = new Image();
+  img.onload = () => {
+    const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
+    const canvas = document.createElement('canvas');
+    canvas.width  = Math.round(img.width  * scale);
+    canvas.height = Math.round(img.height * scale);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    cb(canvas.toDataURL('image/jpeg', quality));
+  };
+  img.src = dataUrl;
+}
+
+imgInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    compressImage(ev.target.result, 800, 0.75, (compressed) => {
+      pendingImage = compressed;
+      imgPreview.src = compressed;
+      imgPreview.style.display = 'block';
+    });
+  };
+  reader.readAsDataURL(file);
+});
+
+// ── Pieces ────────────────────────────────────────────────
 function renderPieces() {
   piecesList.innerHTML = pieces.map((p, i) => `
     <div class="piece-item">
@@ -63,43 +79,6 @@ function addPiece() {
 pieceAddBtn.addEventListener('click', addPiece);
 pieceInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') { e.preventDefault(); addPiece(); }
-});
-
-// ── Storage ───────────────────────────────────────────────
-function save() {
-  try {
-    localStorage.setItem(SEASON_KEY, JSON.stringify(outfits));
-  } catch (e) {
-    alert('Storage full — try deleting some outfits to free up space.');
-  }
-}
-
-// ── Image upload ──────────────────────────────────────────
-function compressImage(dataUrl, maxPx, quality, cb) {
-  const img = new Image();
-  img.onload = () => {
-    const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
-    const canvas = document.createElement('canvas');
-    canvas.width  = Math.round(img.width  * scale);
-    canvas.height = Math.round(img.height * scale);
-    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-    cb(canvas.toDataURL('image/jpeg', quality));
-  };
-  img.src = dataUrl;
-}
-
-imgInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    compressImage(ev.target.result, 800, 0.75, (compressed) => {
-      pendingImage = compressed;
-      imgPreview.src = compressed;
-      imgPreview.style.display = 'block';
-    });
-  };
-  reader.readAsDataURL(file);
 });
 
 // ── Filter ────────────────────────────────────────────────
@@ -134,7 +113,7 @@ function render() {
     return;
   }
 
-  outfitGrid.innerHTML = filtered.map((outfit, i) => `
+  outfitGrid.innerHTML = filtered.map((outfit) => `
     <div class="outfit-card" data-id="${outfit.id}">
       ${outfit.image
         ? `<img class="outfit-img" src="${outfit.image}" alt="${outfit.name}" onclick="openLightbox('${outfit.image}','${outfit.name.replace(/'/g,"\\'")}');event.stopPropagation()" />`
@@ -179,11 +158,11 @@ function render() {
 
 function weatherIcon(w) {
   const icons = {
-    cold:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M4.93 7l14.14 0M4.93 17l14.14 0M2 12h20M7 4.93l10 10.14M17 4.93L7 15.07"/></svg>`,
-    cool:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19a4.5 4.5 0 000-9H17A7 7 0 103 15.5"/></svg>`,
-    mild:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>`,
-    warm:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`,
-    hot:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`,
+    cold: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M4.93 7l14.14 0M4.93 17l14.14 0M2 12h20M7 4.93l10 10.14M17 4.93L7 15.07"/></svg>`,
+    cool: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19a4.5 4.5 0 000-9H17A7 7 0 103 15.5"/></svg>`,
+    mild: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>`,
+    warm: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`,
+    hot:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`,
   };
   return icons[w] || icons['mild'];
 }
@@ -193,11 +172,37 @@ function weatherLabel(w) {
   return labels[w] || w;
 }
 
-// ── Delete ────────────────────────────────────────────────
-window.deleteOutfit = function(id) {
+// ── Supabase CRUD ─────────────────────────────────────────
+async function loadOutfits() {
+  const { data, error } = await sb
+    .from('outfits')
+    .select('*')
+    .eq('season_key', SEASON_KEY)
+    .order('created_at', { ascending: false });
+  if (error) { console.error(error); return; }
+  outfits = data;
+  render();
+}
+
+async function insertOutfit(outfit) {
+  const { data, error } = await sb.from('outfits').insert(outfit).select().single();
+  if (error) { console.error(error); alert('Error saving outfit.'); return; }
+  outfits.unshift(data);
+  render();
+}
+
+async function updateOutfit(id, changes) {
+  const { error } = await sb.from('outfits').update(changes).eq('id', id);
+  if (error) { console.error(error); alert('Error updating outfit.'); return; }
+  outfits = outfits.map(o => o.id === id ? { ...o, ...changes } : o);
+  render();
+}
+
+window.deleteOutfit = async function(id) {
   if (!confirm('Delete this outfit?')) return;
+  const { error } = await sb.from('outfits').delete().eq('id', id);
+  if (error) { console.error(error); alert('Error deleting outfit.'); return; }
   outfits = outfits.filter(o => o.id !== id);
-  save();
   render();
 };
 
@@ -244,33 +249,36 @@ modalOverlay.addEventListener('click', (e) => {
   if (e.target === modalOverlay) closeModal();
 });
 
-
-// ── Save outfit ───────────────────────────────────────────
-form.addEventListener('submit', (e) => {
+// ── Form submit ───────────────────────────────────────────
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const data = Object.fromEntries(new FormData(form));
+  const btnSave = document.querySelector('.btn-save');
+  btnSave.disabled = true;
+  btnSave.textContent = 'Saving…';
+
   if (editingId) {
-    outfits = outfits.map(o => o.id !== editingId ? o : {
-      ...o,
+    const outfit = outfits.find(o => o.id === editingId);
+    await updateOutfit(editingId, {
       name:    data.name,
       weather: data.weather,
       tags:    data.tags,
       pieces:  [...pieces],
-      image:   pendingImage !== null ? pendingImage : o.image,
+      image:   pendingImage !== null ? pendingImage : outfit.image,
     });
   } else {
-    outfits.unshift({
-      id:      crypto.randomUUID(),
-      name:    data.name,
-      weather: data.weather,
-      tags:    data.tags,
-      pieces:  [...pieces],
-      image:   pendingImage,
-      date:    new Date().toISOString(),
+    await insertOutfit({
+      season_key: SEASON_KEY,
+      name:       data.name,
+      weather:    data.weather,
+      tags:       data.tags,
+      pieces:     [...pieces],
+      image:      pendingImage,
     });
   }
-  save();
-  render();
+
+  btnSave.disabled = false;
+  btnSave.textContent = editingId ? 'Update outfit' : 'Save outfit';
   closeModal();
 });
 
@@ -300,7 +308,6 @@ lightboxImg.addEventListener('click', () => {
   lightboxImg.classList.toggle('zoomed', lbScale > 1);
 });
 
-// scroll wheel zoom on desktop
 lightbox.addEventListener('wheel', (e) => {
   e.preventDefault();
   lbScale = Math.min(5, Math.max(1, lbScale - e.deltaY * 0.002));
@@ -308,7 +315,6 @@ lightbox.addEventListener('wheel', (e) => {
   lightboxImg.classList.toggle('zoomed', lbScale > 1);
 }, { passive: false });
 
-// pinch-to-zoom on mobile
 let initDist = 0;
 let initScale = 1;
 lightbox.addEventListener('touchstart', (e) => {
@@ -334,5 +340,4 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ── Init ──────────────────────────────────────────────────
-migrateImages();
-render();
+loadOutfits();
