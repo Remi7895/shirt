@@ -51,18 +51,37 @@ pieceInput.addEventListener('keydown', (e) => {
 
 // ── Storage ───────────────────────────────────────────────
 function save() {
-  localStorage.setItem(SEASON_KEY, JSON.stringify(outfits));
+  try {
+    localStorage.setItem(SEASON_KEY, JSON.stringify(outfits));
+  } catch (e) {
+    alert('Storage full — try deleting some outfits to free up space.');
+  }
 }
 
 // ── Image upload ──────────────────────────────────────────
+function compressImage(dataUrl, maxPx, quality, cb) {
+  const img = new Image();
+  img.onload = () => {
+    const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
+    const canvas = document.createElement('canvas');
+    canvas.width  = Math.round(img.width  * scale);
+    canvas.height = Math.round(img.height * scale);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    cb(canvas.toDataURL('image/jpeg', quality));
+  };
+  img.src = dataUrl;
+}
+
 imgInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = (ev) => {
-    pendingImage = ev.target.result;
-    imgPreview.src = pendingImage;
-    imgPreview.style.display = 'block';
+    compressImage(ev.target.result, 1200, 0.82, (compressed) => {
+      pendingImage = compressed;
+      imgPreview.src = compressed;
+      imgPreview.style.display = 'block';
+    });
   };
   reader.readAsDataURL(file);
 });
