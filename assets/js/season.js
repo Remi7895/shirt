@@ -102,7 +102,7 @@ function render() {
   outfitGrid.innerHTML = filtered.map((outfit, i) => `
     <div class="outfit-card" data-id="${outfit.id}">
       ${outfit.image
-        ? `<img class="outfit-img" src="${outfit.image}" alt="${outfit.name}" />`
+        ? `<img class="outfit-img" src="${outfit.image}" alt="${outfit.name}" onclick="openLightbox('${outfit.image}','${outfit.name.replace(/'/g,"\\'")}');event.stopPropagation()" />`
         : `<div class="outfit-img-placeholder">
              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                <path d="M20 12h24l4 8H16l4-8z" stroke="currentColor" stroke-width="2.5"/>
@@ -209,9 +209,6 @@ modalOverlay.addEventListener('click', (e) => {
   if (e.target === modalOverlay) closeModal();
 });
 
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeModal();
-});
 
 // ── Save outfit ───────────────────────────────────────────
 form.addEventListener('submit', (e) => {
@@ -240,6 +237,65 @@ form.addEventListener('submit', (e) => {
   save();
   render();
   closeModal();
+});
+
+// ── Lightbox ──────────────────────────────────────────────
+const lightbox    = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
+let lbScale = 1;
+
+window.openLightbox = function(src, alt) {
+  lightboxImg.src = src;
+  lightboxImg.alt = alt || '';
+  lbScale = 1;
+  lightboxImg.style.transform = 'scale(1)';
+  lightboxImg.classList.remove('zoomed');
+  lightbox.classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeLightbox = function() {
+  lightbox.classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+lightboxImg.addEventListener('click', () => {
+  lbScale = lbScale === 1 ? 2.5 : 1;
+  lightboxImg.style.transform = `scale(${lbScale})`;
+  lightboxImg.classList.toggle('zoomed', lbScale > 1);
+});
+
+// scroll wheel zoom on desktop
+lightbox.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  lbScale = Math.min(5, Math.max(1, lbScale - e.deltaY * 0.002));
+  lightboxImg.style.transform = `scale(${lbScale})`;
+  lightboxImg.classList.toggle('zoomed', lbScale > 1);
+}, { passive: false });
+
+// pinch-to-zoom on mobile
+let initDist = 0;
+let initScale = 1;
+lightbox.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 2) {
+    initDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    initScale = lbScale;
+  }
+}, { passive: true });
+lightbox.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 2) {
+    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    lbScale = Math.min(5, Math.max(1, initScale * (dist / initDist)));
+    lightboxImg.style.transform = `scale(${lbScale})`;
+    lightboxImg.classList.toggle('zoomed', lbScale > 1);
+  }
+}, { passive: true });
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (lightbox.classList.contains('open')) closeLightbox();
+    else closeModal();
+  }
 });
 
 // ── Init ──────────────────────────────────────────────────

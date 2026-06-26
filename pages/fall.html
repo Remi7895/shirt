@@ -105,6 +105,11 @@
     </div>
   </div>
 
+  <div id="lightbox" class="lightbox-overlay" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img id="lightbox-img" class="lightbox-img" src="" alt="" onclick="event.stopPropagation()" />
+  </div>
+
   <script>const SEASON_KEY = 'shirt_fall'; const SEASON_NAME = 'Fall';</script>
   <script src="../assets/js/season.js"></script>
 </body>
