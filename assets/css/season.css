@@ -441,9 +441,9 @@ body {
 .form-group textarea { resize: vertical; min-height: 72px; }
 
 .img-upload {
-  width: 100%;
+  width: 60%;
+  margin: 0 auto;
   aspect-ratio: 3/4;
-  max-height: 320px;
   border: 2px dashed rgba(26,39,68,0.15);
   border-radius: 12px;
   display: flex;
