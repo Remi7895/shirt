@@ -221,6 +221,9 @@ body {
 
 .outfit-img {
   width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  object-position: top;
   display: block;
 }
 
@@ -439,7 +442,7 @@ body {
 .form-group textarea { resize: vertical; min-height: 72px; }
 
 .img-upload {
-  width: 60%;
+  width: 80%;
   margin: 0 auto;
   aspect-ratio: 3/4;
   border: 2px dashed rgba(26,39,68,0.15);
