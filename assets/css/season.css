@@ -314,7 +314,8 @@ body {
   cursor: pointer;
 }
 
-.action-btn.delete { background: rgba(210,40,40,0.88); color: #fff; }
+.action-btn.edit   { background: rgba(255,255,255,0.88); color: var(--navy); }
+.action-btn.delete { background: rgba(210,40,40,0.88);  color: #fff; }
 .action-btn svg { width: 13px; height: 13px; }
 
 /* ─── EMPTY STATE ─────────────────────────────────────────── */

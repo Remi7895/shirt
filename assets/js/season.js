@@ -12,6 +12,7 @@ const imgInput     = document.getElementById('img-input');
 let outfits      = JSON.parse(localStorage.getItem(SEASON_KEY) || '[]');
 let pendingImage = null;
 let activeFilter = 'all';
+let editingId    = null;
 
 // ── Storage ───────────────────────────────────────────────
 function save() {
@@ -87,6 +88,12 @@ function render() {
         ${outfit.desc ? `<p style="font-size:0.8rem;color:#8A8F9E;margin-top:10px;line-height:1.5">${outfit.desc}</p>` : ''}
       </div>
       <div class="outfit-actions">
+        <button class="action-btn edit" onclick="openEditModal('${outfit.id}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </button>
         <button class="action-btn delete" onclick="deleteOutfit('${outfit.id}')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
@@ -123,9 +130,33 @@ window.deleteOutfit = function(id) {
 
 // ── Modal ─────────────────────────────────────────────────
 window.openModal = function() {
+  editingId = null;
   form.reset();
   pendingImage = null;
   imgPreview.style.display = 'none';
+  document.querySelector('.modal-title').textContent = 'New outfit';
+  document.querySelector('.btn-save').textContent = 'Save outfit';
+  modalOverlay.classList.add('open');
+};
+
+window.openEditModal = function(id) {
+  const outfit = outfits.find(o => o.id === id);
+  if (!outfit) return;
+  editingId = id;
+  form.reset();
+  form.elements['name'].value    = outfit.name    || '';
+  form.elements['weather'].value = outfit.weather || '';
+  form.elements['tags'].value    = outfit.tags    || '';
+  form.elements['desc'].value    = outfit.desc    || '';
+  pendingImage = outfit.image || null;
+  if (pendingImage) {
+    imgPreview.src = pendingImage;
+    imgPreview.style.display = 'block';
+  } else {
+    imgPreview.style.display = 'none';
+  }
+  document.querySelector('.modal-title').textContent = 'Edit outfit';
+  document.querySelector('.btn-save').textContent = 'Update outfit';
   modalOverlay.classList.add('open');
 };
 
@@ -145,15 +176,26 @@ document.addEventListener('keydown', (e) => {
 form.addEventListener('submit', (e) => {
   e.preventDefault();
   const data = Object.fromEntries(new FormData(form));
-  outfits.unshift({
-    id:      crypto.randomUUID(),
-    name:    data.name,
-    weather: data.weather,
-    tags:    data.tags,
-    desc:    data.desc,
-    image:   pendingImage,
-    date:    new Date().toISOString(),
-  });
+  if (editingId) {
+    outfits = outfits.map(o => o.id !== editingId ? o : {
+      ...o,
+      name:    data.name,
+      weather: data.weather,
+      tags:    data.tags,
+      desc:    data.desc,
+      image:   pendingImage !== null ? pendingImage : o.image,
+    });
+  } else {
+    outfits.unshift({
+      id:      crypto.randomUUID(),
+      name:    data.name,
+      weather: data.weather,
+      tags:    data.tags,
+      desc:    data.desc,
+      image:   pendingImage,
+      date:    new Date().toISOString(),
+    });
+  }
   save();
   render();
   closeModal();
