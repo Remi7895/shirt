@@ -442,7 +442,8 @@ body {
 
 .img-upload {
   width: 100%;
-  aspect-ratio: 16/9;
+  aspect-ratio: 3/4;
+  max-height: 320px;
   border: 2px dashed rgba(26,39,68,0.15);
   border-radius: 12px;
   display: flex;
