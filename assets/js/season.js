@@ -10,6 +10,22 @@ const imgPreview   = document.getElementById('img-preview');
 const imgInput     = document.getElementById('img-input');
 
 let outfits      = JSON.parse(localStorage.getItem(SEASON_KEY) || '[]');
+
+// ── Migrate old uncompressed images ───────────────────────
+function migrateImages() {
+  const toMigrate = outfits.filter(o => o.image && o.image.length > 100000);
+  if (!toMigrate.length) return;
+  let done = 0;
+  toMigrate.forEach(o => {
+    compressImage(o.image, 800, 0.75, (compressed) => {
+      outfits = outfits.map(x => x.id === o.id ? { ...x, image: compressed } : x);
+      done++;
+      if (done === toMigrate.length) {
+        try { localStorage.setItem(SEASON_KEY, JSON.stringify(outfits)); } catch(e) {}
+      }
+    });
+  });
+}
 let pendingImage = null;
 let activeFilter = 'all';
 let editingId    = null;
@@ -77,7 +93,7 @@ imgInput.addEventListener('change', (e) => {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = (ev) => {
-    compressImage(ev.target.result, 1200, 0.82, (compressed) => {
+    compressImage(ev.target.result, 800, 0.75, (compressed) => {
       pendingImage = compressed;
       imgPreview.src = compressed;
       imgPreview.style.display = 'block';
@@ -318,4 +334,5 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ── Init ──────────────────────────────────────────────────
+migrateImages();
 render();
